@@ -26,8 +26,4 @@ yarn-debug.log*
 yarn-error.log*
 
 # types
-src/types/*
-!src/types/common.ts
 typechain/*
-!src/types/factories
-src/types/factories/*

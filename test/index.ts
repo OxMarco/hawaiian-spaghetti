@@ -1,19 +1,36 @@
 import { expect } from "chai";
-import { ethers } from "hardhat";
+import { ethers, waffle } from "hardhat";
+import type { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
+import { stETH, stETHcrvPool, crvLPtoken, yvault } from "../constants";
 
-describe("Greeter", function () {
-  it("Should return the new greeting once it's changed", async function () {
-    const Greeter = await ethers.getContractFactory("Greeter");
-    const greeter = await Greeter.deploy("Hello, world!");
-    await greeter.deployed();
+describe("Strategy", function () {
+  it("Should execute investment", async function () {
+    const signers: SignerWithAddress[] = await ethers.getSigners();
+    const investor = signers[0];
+    const provider = waffle.provider;
 
-    expect(await greeter.greet()).to.equal("Hello, world!");
+    const Strategy = await ethers.getContractFactory("Strategy");
+    const strategy = await Strategy.deploy(
+      stETH, // Lido
+      stETHcrvPool, // stETH-ETH Curve pool
+      crvLPtoken, // Curve LP token
+      yvault // Yearn vault
+    );
 
-    const setGreetingTx = await greeter.setGreeting("Hola, mundo!");
+    await strategy.deployed();
 
-    // wait until the transaction is mined
-    await setGreetingTx.wait();
+    const initialBalance = await provider.getBalance(investor.address);
 
-    expect(await greeter.greet()).to.equal("Hola, mundo!");
+    const amount = ethers.utils.parseEther("100.0");
+
+    const investTX = await strategy.invest(amount, {value: amount});
+    await investTX.wait();
+
+    //const disinvestTX = await strategy.disinvest();
+    //await disinvestTX.wait();
+
+    const finalBalance = await provider.getBalance(investor.address);
+
+    expect(initialBalance).to.be.gt(finalBalance);
   });
 });

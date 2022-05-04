@@ -2,8 +2,9 @@
   "name": "@oxmarco/hawaiian-spaghetti",
   "description": "Codebase for the practical part of the workshop *An intro to degen DeFi strategies",
   "version": "1.0.0",
-  "license": "GNU",
+  "license": "GPL-3.0-or-later",
   "dependencies": {
+    "@openzeppelin/contracts": "^4.6.0",
     "hardhat": "^2.9.3"
   },
   "devDependencies": {
